@@ -1,0 +1,167 @@
+doctype html
+html.ocks-org
+  meta(charset='utf-8')
+  title CDP-sankeyScope1
+  style.
+    @import url('../stylesheets/style.styl');
+    @font-face {
+    font-family: 'myFirstFont';
+    src: url('HelveticaNeueLTPro-Lt.otf');
+    }
+    .node rect {
+    cursor: move;
+    fill-opacity: .9;
+    shape-rendering: crispEdges;
+    }
+    .node text {
+    pointer-events: none;
+    }
+    .link {
+    fill: none;
+    stroke: #B42E52;
+    stroke-opacity: .2;
+    }
+    .link:hover {
+    stroke-opacity: .5;
+    }
+  body
+    header
+      aside Oct 2016
+      a(href='../', rel='author') CDP Data Team
+    h1(style='float:left') Scope 1 /
+    h1(style='color:#B42E52;float:left')  Activities  
+    p#chart
+      #tooltip.hidden
+        // <p><span id="value">100</span>%</p>
+    p(style='float:left')
+      | The diagram shows overall Scope 1 GHG emissions as defined by the GHG Protocol. This is the scenario for all CDP responders in 2016 : energy-intensive clusters are on the left, and industries are on the right. Intermediate nodes group related forms of production and show how emissions are transmitted along all activities in the industry classification. The thickness of each link encodes the amount of flow from source to target.
+    p(style='float:left') Drag to rearrange nodes.
+    aside
+      a(href='https://en.wikipedia.org/wiki/Sankey_diagram') Sankey diagrams
+      |  are a specific type of flow diagram, in which the width of the arrows is shown proportionally to the flow quantity.
+      | These diagrams are typically used to visualize energy transfers between processes.
+    script(src='https://d3js.org/d3.v4.min.js')
+    script(src='../javascripts/sankey.js')
+    script.
+      var units = "mtCO2e";
+      // set the dimensions and margins of the graph
+      var margin = {top: 10, right: 10, bottom: 10, left: 10},
+      width = 900 - margin.left - margin.right,
+      height = 1200 - margin.top - margin.bottom;
+      // format variables
+      var formatNumber = d3.format(",.0f"),    // zero decimal places
+      format = function(d) { return formatNumber(d) + " " + units; },
+      color = d3.scaleOrdinal(d3.schemeCategory20);
+      // append the svg object to the body of the page
+      var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+      "translate(" + margin.left + "," + margin.top + ")");
+      // Set the sankey diagram properties
+      var sankey = d3.sankey()
+      .nodeWidth(15)
+      .nodePadding(30)
+      .size([width, height]);
+      var path = sankey.link();
+      // load the data
+      d3.json("../jsons/sankey6.json", function(error, graph) {
+      sankey
+      .nodes(graph.nodes)
+      .links(graph.links)
+      .layout(32);
+      // add in the links
+      var link = svg.append("g").selectAll(".link")
+      .data(graph.links)
+      .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .sort(function(a, b) { return b.dy - a.dy; })
+      .on("mouseover", function(d) {
+      //for the HTML tooltip, we're not interested in a
+      //transformation relative to an internal SVG coordinate
+      //system, but relative to the page body
+      //We can't get that matrix directly,
+      //but we can get the conversion to the
+      //screen coordinates.
+      var matrix = this.getScreenCTM()
+      .translate(+this.getAttribute("cx"),
+      +this.getAttribute("cy"));
+      //Update the tooltip position and value
+      d3.select("#tooltip")
+      .style("left", (window.pageXOffset + matrix.e - 200) + "px")
+      .style("top", (window.pageYOffset + matrix.f + 50) + "px")
+      .text(d.source.name + " → " + d.target.name + "\\n" + format(d.value));
+      //Show the tooltip
+      d3.select("#tooltip").classed("hidden", false);
+      })
+      .on("mouseout", function() {
+      //Hide the tooltip
+      d3.select("#tooltip").classed("hidden", true);
+      })
+      ;
+      // add the link titles
+      //  link.append("title")
+      //        .text(function(d) {
+      //    		return d.source.name + " → " +
+      //                d.target.name + "\\n" + format(d.value); });
+      // add in the nodes
+      var node = svg.append("g").selectAll(".node")
+      .data(graph.nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")"; })
+      .call(d3.drag()
+      .subject(function(d) {
+      return d;
+      })
+      .on("start", function() {
+      this.parentNode.appendChild(this);
+      })
+      .on("drag", dragmove));
+      // add the rectangles for the nodes
+      node.append("rect")
+      .attr("height", function(d) { return d.dy; })
+      .attr("width", sankey.nodeWidth())
+      .style("fill", "#B42E52")
+      .style("stroke", function(d) {
+      return d3.rgb(d.color).darker(2); })
+      .append("title")
+      .text(function(d) {
+      return d.name + "\\n" + format(d.value); });
+      // add in the title for the nodes
+      node.append("text")
+      .attr("x", -6 )
+      .attr("y", function(d) { return d.dy / 2; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d) { return d.name; })
+      .filter(function(d) { return d.x < width / 2; })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+      // the function for moving the nodes
+      function dragmove(d) {
+      d3.select(this).attr("transform",
+      "translate(" + (
+      d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+      )
+      + "," + (
+      d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+      ) + ")");
+      sankey.relayout();
+      link.attr("d", path);
+      }
+      });
+    p(style='float:left')
+      | This example is built with 
+      a(href='https://bost.ocks.org/mike/sankey/') Mike Bostock D3’s Sankey plugin 
+      | . The plugin takes as input the nodes and weighted links, computing positions via iterative relaxation. After fixing the horizontal position of each node, the algorithm starts from the sources on the left, positioning downstream nodes so as to minimize link distance. A reverse pass is then made from right-to-left, and then the entire process is repeated several times. Overlapping nodes are shifted to avoid collision.
+    p.attribution
+      | Source: 
+      a(href='http://www.decc.gov.uk/en/content/cms/tackling/2050/calculator_on/calculator_on.aspx') Clean & Complete Dataset 
+      a(href='http://tamc.github.com/Sankey/') @CDP
+      img(src='../images/cdpLogo.png', style='float:right;width:130px;height:50px;')

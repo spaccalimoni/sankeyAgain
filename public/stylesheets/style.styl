@@ -1,0 +1,169 @@
+html
+  min-width 1040px
+
+@font-face
+  font-family 'myFirstFont'
+  src url('HelveticaNeueLTPro-Lt.otf')
+
+.ocks-org
+  body
+    background #fcfcfa
+    color #333
+    font-family myFirstFont
+    margin 1em auto 4em auto
+    position relative
+    width 960px
+
+.ocks-org h1,
+.ocks-org h2,
+.ocks-org h3,
+.ocks-org h4
+  color #000
+
+.ocks-org header,
+.ocks-org footer
+  color #636363
+  float right
+
+h1
+  font-size 64px
+  font-weight 300
+  letter-spacing -2px
+  margin .3em 0 .1em 0
+  & ~ aside
+    font-size small
+    right 20px
+    position fixed
+    width 180px
+    top 200px
+
+h2
+  margin-top 2em
+
+h1, h2
+  text-rendering optimizeLegibility
+
+h2 a[name],
+h2 a[id]
+  color #ccc
+  right 100%
+  padding 0 .3em
+  position absolute
+
+header,
+footer
+  font-size small
+
+.ocks-org header aside,
+.ocks-org footer aside
+  float left
+  margin-right .5em
+
+.ocks-org header aside:after,
+.ocks-org footer aside:after
+  padding-left .5m
+  content " /"
+
+footer
+  margin-top 8em
+
+.attribution
+  font-size small
+  margin-bottom 2em
+
+body > p, li > p
+  line-height 1.5em
+
+body
+  & > p
+    width 900px
+  & > blockquote
+    width 640px
+  & > pre
+    border-left solid 2px #ccc
+    padding-left 18px
+    margin 2em 0 2em -20px
+
+blockquote
+  q
+    display block
+    font-style oblique
+    line-height 1.5em
+    display inline
+
+ul
+  padding 0
+
+li
+  width 690px
+  margin-left 30px
+
+a
+  color steelblue
+  &:not(:hover)
+    text-decoration none
+
+code
+  line-height 1em
+
+textarea
+  font-size 100%
+
+.html .value,
+.javascript .string,
+.javascript .regexp
+  color #756bb1
+
+.html .tag,
+.css .tag,
+.javascript .keyword
+  color #3182bd
+
+.comment
+  color #636363
+
+.html .doctype,
+.javascript .number
+  color #31a354
+
+.html .attribute,
+.css .attribute,
+.javascript .class,
+.javascript .special
+  color #e6550d
+
+.axis path, .axis line
+  fill none
+  stroke #000
+  shape-rendering crispEdges
+
+sup, sub
+  line-height 0
+
+q
+  &:before
+    content "â€œ"
+  &:after
+    content "â€"
+
+blockquote q:before,
+blockquote q:after
+  content ""
+
+#tooltip
+  position fixed
+  width 165px
+  height auto
+  padding 12px
+  background #fcfcfa
+  color #000
+  border-radius 2px
+  &.hidden
+    display none
+  p
+    margin 0
+    font-family myFirstFont
+    font-size 4px
+    line-height 10px
+
+
