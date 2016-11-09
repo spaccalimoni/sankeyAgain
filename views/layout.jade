@@ -74,7 +74,7 @@ html.ocks-org
       d3.select("#tooltip")
       .style("left", (window.pageXOffset + matrix.e - 200) + "px")
       .style("top", (window.pageYOffset + matrix.f + 50) + "px")
-      .text(d.source.name + " → " + d.target.name + "\\n" + format(d.value));
+      .text(d.source.name + " → " + d.target.name + "\n" + format(d.value));
       //Show the tooltip
       d3.select("#tooltip").classed("hidden", false);
       })
